@@ -25,6 +25,21 @@ defmodule Locator.AddressRegistry do
 
   """
 
+  @typedoc """
+  This type refers to the name of any module that uses `Locator.AddressRegistry`.
+  """
+  @type t :: module
+
+  @typedoc """
+  The options that can be passed into the use macro.
+  - layers: a list of layers this module will be attached to.
+  - settings: middleware and layer settings defined on a module using `Entangle.Seed`.
+  """
+  @type option ::
+    {:settings, Entangle.Seed.t}
+    | {:layers, Layers.layers | Layers.layer_query}
+  @type options :: [option]
+
   @doc """
   Callback that will automatically be defined upon using `Locator.AddressRegistry`.
   The generated function is used by the `Locator` module this registry is registered to, and normally not called directly by the user.
