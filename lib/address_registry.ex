@@ -22,22 +22,21 @@ defmodule Locator.AddressRegistry do
       ...> |> Result.map(fn greeter -> greeter.hi() end)
       ...> |> Result.unwrap!()
       :lol
- 
-  """
 
+  """
 
   @doc """
   Callback that will automatically be defined upon using `Locator.AddressRegistry`.
   The generated function is used by the `Locator` module this registry is registered to, and normally not called directly by the user.
   The action associated with the location passed as argument will be retrieved by calling this function.
   """
-  @callback locate(Locator.location) :: {:ok, Locator.Action.t} | {:error, String.t}
+  @callback locate(Locator.location()) :: {:ok, Locator.Action.t()} | {:error, String.t()}
 
   @doc """
   Callback that will automatically be defined upon using `Locator.AddressRegistry`.
   Calling this function will obtain the layers this registry is associated with.
   """
-  @callback active_layers() :: {:some, Layers.t} | :none
+  @callback active_layers() :: {:some, Layers.t()} | :none
 
   @doc false
   defmacro __using__(opts) do
@@ -48,12 +47,12 @@ defmodule Locator.AddressRegistry do
       Module.register_attribute(__MODULE__, :layers, [])
 
       @settings Keyword.get(opts, :settings)
-      |> Option.return()
-      |> Option.map(fn
-        settings when is_atom(settings) -> settings.settings()
-        settings -> settings
-      end)
-      |> Option.or_else(Entangle.Seed.default_settings())
+                |> Option.return()
+                |> Option.map(fn
+                  settings when is_atom(settings) -> settings.settings()
+                  settings -> settings
+                end)
+                |> Option.or_else(Entangle.Seed.default_settings())
 
       Keyword.get(opts, :layers)
       |> Option.return()
@@ -65,7 +64,8 @@ defmodule Locator.AddressRegistry do
 
   @doc false
   defmacro __before_compile__(env) do
-    %Entangle.Seed{layers: layers, layer_mask: layer_mask} = Module.get_attribute(env.module, :settings)
+    %Entangle.Seed{layers: layers, layer_mask: layer_mask} =
+      Module.get_attribute(env.module, :settings)
 
     actions =
       Module.get_attribute(env.module, :actions)
@@ -88,7 +88,9 @@ defmodule Locator.AddressRegistry do
         unquote(Macro.escape(actions))[address]
         |> Option.return()
         |> Option.map(&Result.return/1)
-        |> Option.or_else({:error, "No action found! " <> to_string(domain) <> ":" <> to_string(address)})
+        |> Option.or_else(
+          {:error, "No action found! " <> to_string(domain) <> ":" <> to_string(address)}
+        )
       end
 
       @impl Locator.AddressRegistry

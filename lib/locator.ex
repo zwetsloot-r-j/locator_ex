@@ -76,15 +76,16 @@ defmodule Locator do
   The response obtained by `Locator.locate/1`, which will either be the action wrapped in an :ok tuple,
   or a string explaining what domain or address could not be found, wrapped in an error tuple.
   """
-  @type response :: {:ok, Locator.Action.t} | {:error, String.t}
+  @type response :: {:ok, Locator.Action.t()} | {:error, String.t()}
 
   @typedoc """
   The options that can be passed into the use macro.
   - layers: a list of layers this module will be attached to.
   - settings: middleware and layer settings defined on a module using `Entangle.Seed`.
   """
-  @type option :: {:layers, Layers.layers | Layers.layer_query}
-    | {:settings, Entangle.Seed.t}
+  @type option ::
+          {:layers, Layers.layers() | Layers.layer_query()}
+          | {:settings, Entangle.Seed.t()}
   @type options :: [option]
 
   @doc """
@@ -122,7 +123,8 @@ defmodule Locator do
 
   @doc false
   defmacro __before_compile__(env) do
-    %Entangle.Seed{layers: layers, layer_mask: layer_mask} = Module.get_attribute(env.module, :settings)
+    %Entangle.Seed{layers: layers, layer_mask: layer_mask} =
+      Module.get_attribute(env.module, :settings)
 
     domains =
       Module.get_attribute(env.module, :domains)
@@ -143,7 +145,9 @@ defmodule Locator do
         unquote(Macro.escape(domains))[domain]
         |> Option.return()
         |> Option.map(fn address_registry -> address_registry.locate(location) end)
-        |> Option.or_else({:error, "Domain not found! " <> to_string(domain) <> ":" <> to_string(address)})
+        |> Option.or_else(
+          {:error, "Domain not found! " <> to_string(domain) <> ":" <> to_string(address)}
+        )
       end
     end
   end
@@ -151,7 +155,7 @@ defmodule Locator do
   @doc """
   Macro to register a domain in the form of a `Locator.AddressRegistry`.
   """
-  @spec domain(domain, Locator.AddressRegistry.t, options) :: Macro.t
+  @spec domain(domain, Locator.AddressRegistry.t(), options) :: Macro.t()
   defmacro domain(domain, address_registry, options \\ []) do
     quote do
       @domains {unquote(domain), unquote(address_registry), unquote(options)}

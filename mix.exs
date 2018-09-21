@@ -24,7 +24,7 @@ defmodule Locator.MixProject do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.19", only: [:dev], runtime: false},
       {:entangle, git: "https://github.com/nanaki04/entangle_ex.git"},
-      {:result, git: "https://github.com/nanaki04/result_ex.git"},
+      {:result, git: "https://github.com/nanaki04/result_ex.git"}
     ]
   end
 end

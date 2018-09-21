@@ -9,9 +9,9 @@ defmodule LocatorTest do
       def run(next) do
         fn state ->
           state
-          |> IO.inspect(label: IO.ANSI.blue <> "input" <> IO.ANSI.reset)
+          |> IO.inspect(label: IO.ANSI.blue() <> "input" <> IO.ANSI.reset())
           |> next.()
-          |> IO.inspect(label: IO.ANSI.cyan <> "response" <> IO.ANSI.reset)
+          |> IO.inspect(label: IO.ANSI.cyan() <> "response" <> IO.ANSI.reset())
         end
       end
     end
